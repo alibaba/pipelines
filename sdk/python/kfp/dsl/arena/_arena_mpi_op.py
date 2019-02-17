@@ -23,14 +23,15 @@ import logging
 class MPIOp(dsl.ContainerOp):
   """Submit MPI Job."""
 
-  def __init__(self, image, workers, gpus, cpu,memory,rdma,
-          tensorboard,tensorboardImage,data,arenaImage="cheyang/arena_launcher",outputData,command):
+  # arena Image is "cheyang/arena_launcher"
+  def __init__(self, name, arenaImage, image, workers, gpus, cpu, memory, rdma,
+          tensorboard, tensorboardImage, data, outputData, command):
 
     super(MPIOp, self).__init__(
-          name=name,
+          name='mpirun',
           image=arenaImage,
           command=['python','arena_launcher.py'],
-          arguments=[ "--name", workflow.name,
+          arguments=[ "--name", '{0}-{{workflow.name}}'.format(name),
                       "--tensorboard", tensorboard,
                       "mpijob",
                       "--gpus", gpus,
@@ -41,9 +42,7 @@ class MPIOp(dsl.ContainerOp):
                       "--rdma", rdma,
                       "--data", data,
                       "--output-data", outputData,
-                      "--",
-                      command,
-                    ],
-          file_outputs = {'train': '/output.txt'})
+                      "--", command],
+          file_outputs={'train': '/output.txt'})
 
 

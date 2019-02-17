@@ -33,8 +33,7 @@ class PrintOp(dsl.ContainerOp):
   name='pipeline mpirun',
   description='shows how to use mpirun.'
 )
-def mpirun(name=dsl.PipelineParam(name='name',
-                                  value='mpirun'),
+def mpirun(name='mpirun',
     image=dsl.PipelineParam(name='image',
                             value='registry.cn-hangzhou.aliyuncs.com/tensorflow-samples/horovod:0.13.11-tf1.10.0-torch0.4.0-py3.5'),
     workers=dsl.PipelineParam(name='workers',
@@ -53,6 +52,8 @@ def mpirun(name=dsl.PipelineParam(name='name',
                            value=''),
     tensorboard=dsl.PipelineParam(name='tensorboard',
                                   value='False'),
+    tensorboardImage=dsl.PipelineParam(name='tensorboardImage',
+                                  value='tensorflow/tensorflow:1.12.0'),
     arenaImage=dsl.PipelineParam(name='arenaImage',
                                   value='cheyang/arena_launcher'),
     command=dsl.PipelineParam(name='command',
@@ -60,6 +61,7 @@ def mpirun(name=dsl.PipelineParam(name='name',
 
 
   mpi = arena.MPIOp(
+    name=name,
 		image=image,
 		tensorboard=tensorboard,
 		workers=workers,
@@ -68,6 +70,9 @@ def mpirun(name=dsl.PipelineParam(name='name',
     rdma=rdma,
     memory=memory,
     data=data,
+    outputData=outputData,
+    arenaImage=arenaImage,
+    tensorboardImage=tensorboardImage,
 		command=command)
   PrintOp('mpioutput %s !' % mpi.output)
 
