@@ -89,6 +89,9 @@ def generate_mpjob_command(args):
     output_data = args.output_data
     data = args.data
     tensorboard_image = args.tensorboard_image
+    tensorboard = str2bool(args.tensorboard)
+    rdma = str2bool(args.tensorboard)
+    log_dir = args.log_dir
 
     commandArray = [
     'arena', 'submit', 'mpijob',
@@ -112,6 +115,14 @@ def generate_mpjob_command(args):
     if tensorboard:
         commandArray.append("--tensorboard")
 
+    if rdma:
+        commandArray.append("--rdma")
+
+    if os.path.isdir(args.log_dir):  
+        commandArray.append("--logdir={0}".format(args.log_dir))
+    else:
+        logging.info("skip log dir :{0}".format(args.log_dir))
+
     if len(data) > 0:
       dataList = data.split(",")
       if len(output_data) > 0:
@@ -132,6 +143,7 @@ def main(argv=None):
   parser.add_argument('--name', type=str,
                       help='The job name to specify.',default=None)
   parser.add_argument('--tensorboard', type=str, default="False")
+  parser.add_argument('--rdma', type=str, default="False")
   parser.add_argument('--tensorboard-image', type=str, default='tensorflow/tensorflow:1.12.0')
   parser.add_argument('--timeout-minutes', type=int,
                       default=30,
@@ -139,6 +151,7 @@ def main(argv=None):
   # parser.add_argument('--command', type=str)
   parser.add_argument('--output-dir', type=str, default='')
   parser.add_argument('--output-data', type=str, default='')
+  parser.add_argument('--log-dir', type=str, default='')
   parser.add_argument('--data', type=str, default='')
   subparsers = parser.add_subparsers(help='arena sub-command help')
 
@@ -147,8 +160,8 @@ def main(argv=None):
   parser_mpi.add_argument('--image', type=str)
   parser_mpi.add_argument('--workers', type=int, default=2)
   parser_mpi.add_argument('--gpus', type=int, default=0)
-  parser_mpi.add_argument('--cpu', type=int, default=1)
-  parser_mpi.add_argument('--memory', type=int, default=1)
+  parser_mpi.add_argument('--cpu', type=int, default=0)
+  parser_mpi.add_argument('--memory', type=int, default=0)
   parser_mpi.set_defaults(func=generate_mpjob_command)
 
 

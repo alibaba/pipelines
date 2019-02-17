@@ -23,7 +23,7 @@ import logging
 class MPIOp(dsl.ContainerOp):
   """Submit MPI Job."""
 
-  def __init__(self, image, workers, gpus, cpu,memory,
+  def __init__(self, image, workers, gpus, cpu,memory,rdma,
           tensorboard,tensorboardImage,data,arenaImage="cheyang/arena_launcher",outputData,command):
 
     super(MPIOp, self).__init__(
@@ -38,6 +38,7 @@ class MPIOp(dsl.ContainerOp):
                       "--image", image,
                       "--cpu", cpu,
                       "--memory", memory,
+                      "--rdma", rdma,
                       "--data", data,
                       "--output-data", outputData,
                       "--",
