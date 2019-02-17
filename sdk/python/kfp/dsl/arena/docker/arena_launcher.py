@@ -191,7 +191,7 @@ def main(argv=None):
   
   command=command.replace("--name={0}".format(name),"--name={0}".format(fullname))
   
-  logging.info('Start training.')
+  logging.info('Start training %s.'.format(command))
   
   _submit_job(command)
   
