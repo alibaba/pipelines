@@ -22,6 +22,9 @@ RUN apt-get update -y
 
 RUN apt-get install --no-install-recommends -y -q ca-certificates python-dev python-setuptools wget unzip git
 
+RUN pip install --upgrade pip && \
+    pip install pyyaml==3.12 six==1.11.0 requests==2.18.4
+
 COPY --from=build /go/src/github.com/kubeflow/arena/bin/arena /usr/local/bin/arena
 
 COPY --from=build /usr/local/bin/helm /usr/local/bin/helm
@@ -33,10 +36,6 @@ COPY --from=build /usr/local/bin/kubectl /usr/local/bin/kubectl
 COPY --from=build /go/src/github.com/kubeflow/arena/charts /charts
 
 COPY arena_launcher.py /root
-
-RUN pip install --upgrade pip && \
-    pip install pyyaml==3.12 six==1.11.0 requests==2.18.4
-
 
 WORKDIR /root
 

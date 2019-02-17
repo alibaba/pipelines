@@ -36,6 +36,7 @@ setup(
       'kfp.components.structures',
       'kfp.components.structures.kubernetes',
       'kfp.dsl',
+      'kfp.dsl.arena',
       'kfp.notebook',
       'kfp_experiment',
       'kfp_experiment.api',

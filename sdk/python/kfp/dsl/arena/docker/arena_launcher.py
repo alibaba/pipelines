@@ -1,17 +1,3 @@
-# Copyright 2018 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 """
 Usage:
 python arena_launcher.py
@@ -101,7 +87,8 @@ def generate_mpjob_command(args):
     tensorboard = args.tensorboard
     image = args.image
     output_data = args.output_data
-    dataList = args.dataList
+    data = args.data
+    tensorboard_image = args.tensorboard_image
 
     commandArray = [
     'arena', 'submit', 'mpijob',
@@ -119,8 +106,8 @@ def generate_mpjob_command(args):
     if memory >0:
         commandArray.append("--memory={0}".format(memory))
 
-    if tensorboardImage != "tensorflow/tensorflow:1.12.0":
-        commandArray.append("--tensorboardImage={0}".format(tensorboardImage))    
+    if tensorboard_image != "tensorflow/tensorflow:1.12.0":
+        commandArray.append("--tensorboardImage={0}".format(tensorboard_image))    
 
     if tensorboard:
         commandArray.append("--tensorboard")
@@ -135,21 +122,24 @@ def generate_mpjob_command(args):
 
     return commandArray, "mpijob"
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
+
 def main(argv=None):
   setup_custom_logging()
   parser = argparse.ArgumentParser(description='Arena launcher')
   parser.add_argument('--name', type=str,
                       help='The job name to specify.',default=None)
-  parser.add_argument('--job-type', type=str,
-                      help='The job type to specify, tfjob or mpijob',default=None)
-  parser.add_argument('--tensorboard', type=bool, default=False)
+  parser.add_argument('--tensorboard', type=str, default="False")
+  parser.add_argument('--tensorboard-image', type=str, default='tensorflow/tensorflow:1.12.0')
   parser.add_argument('--timeout-minutes', type=int,
                       default=30,
                       help='Time in minutes to wait for the Job submitted by arena to complete')
   # parser.add_argument('--command', type=str)
-  parser.add_argument('--output-dir', type=str)
-  parser.add_argument('--output-data', type=str)
-  parser.add_argument('--data', type=str)
+  parser.add_argument('--output-dir', type=str, default='')
+  parser.add_argument('--output-data', type=str, default='')
+  parser.add_argument('--data', type=str, default='')
   subparsers = parser.add_subparsers(help='arena sub-command help')
 
   #create the parser for the 'mpijob' command
@@ -157,7 +147,7 @@ def main(argv=None):
   parser_mpi.add_argument('--image', type=str)
   parser_mpi.add_argument('--workers', type=int, default=2)
   parser_mpi.add_argument('--gpus', type=int, default=0)
-  parser_mpi.add_argument('--cpus', type=int, default=1)
+  parser_mpi.add_argument('--cpu', type=int, default=1)
   parser_mpi.add_argument('--memory', type=int, default=1)
   parser_mpi.set_defaults(func=generate_mpjob_command)
 
@@ -169,7 +159,7 @@ def main(argv=None):
   remaining_args = all_args[separator_idx + 1:]
   
   args = parser.parse_args(launcher_args)
-  commandArray, jobtype = args.func(args)
+  commandArray, job_type = args.func(args)
 
   args_dict = vars(args)
   if args.name is None:
@@ -179,14 +169,16 @@ def main(argv=None):
     logging.error("Please specify the command.")
     sys.exit(-1)
 
+  internalCommand = ' '.join(remaining_args)
+
   name = args.name
   fullname = name + datetime.datetime.now().strftime("%Y%M%d%H%M%S")
   timeout_minutes = args_dict.pop('timeout_minutes')
 
 
-  enableTensorboard = args_dict.pop('tensorboard')
+  enableTensorboard = str2bool(args.tensorboard)
 
-  commandArray.append(remaining_args[0])
+  commandArray.append('"{0}"'.format(internalCommand))
   command = ' '.join(commandArray)
   
   command=command.replace("--name={0}".format(name),"--name={0}".format(fullname))

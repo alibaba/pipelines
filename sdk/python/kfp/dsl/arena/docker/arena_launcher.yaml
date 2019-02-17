@@ -12,11 +12,21 @@ spec:
     - python
     - arena_launcher.py
     args:
-    - --name=mpi-dist-123
-    - --job-type=mpijob
-    - --tensorboard=true
+    - --name
+    - mpi-dist-123
+    - --data
+    - ","
+    - --tensorboard
+    - "True"
+    - mpijob
+    - --image
+    - registry.cn-hangzhou.aliyuncs.com/tensorflow-samples/horovod:0.13.11-tf1.10.0-torch0.4.0-py3.5
+    - --gpus
+    - "1"
+    - --workers
+    - "2"
     - --
-    - arena submit mpi --name=mpi-dist-123 --gpus=1 --workers=2 --image=registry.cn-hangzhou.aliyuncs.com/tensorflow-samples/horovod:0.13.11-tf1.10.0-torch0.4.0-py3.5 --tensorboard "mpirun python /benchmarks/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py --model resnet101 --batch_size 64 --variable_update horovod --train_dir=/training_logs --summary_verbosity=3 --save_summaries_steps=10"
+    - mpirun python /benchmarks/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py --model resnet101 --batch_size 64 --variable_update horovod --train_dir=/training_logs --summary_verbosity=3 --save_summaries_steps=10
     image: cheyang/arena_launcher
     imagePullPolicy: Always
     name: arena-launcher
