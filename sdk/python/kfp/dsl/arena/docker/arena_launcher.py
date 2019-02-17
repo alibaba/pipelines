@@ -123,9 +123,9 @@ def generate_mpjob_command(args):
     else:
         logging.info("skip log dir :{0}".format(args.log_dir))
 
-    if len(data) > 0:
+    if len(data) > 0 and data != 'None':
       dataList = data.split(",")
-      if len(output_data) > 0:
+      if len(output_data) > 0 and data != 'None':
         dataList = dataList + list(set([output_data]) - set(dataList))
 
         for i in range(len(dataList)):
@@ -139,6 +139,9 @@ def str2bool(v):
 
 def main(argv=None):
   setup_custom_logging()
+  import sys
+  all_args = sys.argv[1:]
+  logging.info("args: {0}".format(all_args))
   parser = argparse.ArgumentParser(description='Arena launcher')
   parser.add_argument('--name', type=str,
                       help='The job name to specify.',default=None)
@@ -150,9 +153,9 @@ def main(argv=None):
                       help='Time in minutes to wait for the Job submitted by arena to complete')
   # parser.add_argument('--command', type=str)
   parser.add_argument('--output-dir', type=str, default='')
-  parser.add_argument('--output-data', type=str, default='')
+  parser.add_argument('--output-data', type=str, default='None')
   parser.add_argument('--log-dir', type=str, default='')
-  parser.add_argument('--data', type=str, default='')
+  parser.add_argument('--data', type=str, default='None')
   subparsers = parser.add_subparsers(help='arena sub-command help')
 
   #create the parser for the 'mpijob' command
@@ -164,9 +167,6 @@ def main(argv=None):
   parser_mpi.add_argument('--memory', type=int, default=0)
   parser_mpi.set_defaults(func=generate_mpjob_command)
 
-
-  import sys
-  all_args = sys.argv[1:]
   separator_idx = all_args.index('--')
   launcher_args = all_args[:separator_idx]
   remaining_args = all_args[separator_idx + 1:]

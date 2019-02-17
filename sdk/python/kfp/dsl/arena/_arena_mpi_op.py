@@ -24,14 +24,16 @@ class MPIOp(dsl.ContainerOp):
   """Submit MPI Job."""
 
   # arena Image is "cheyang/arena_launcher"
-  def __init__(self, name, arenaImage, image, workers, gpus, cpu, memory, rdma,
-          tensorboard, tensorboardImage, data, outputData, command):
+  def __init__(self, name, image, workers, gpus, cpu, memory, rdma,
+          tensorboard, tensorboardImage, command,
+          data='None', outputData='None',
+          arenaImage='cheyang/arena_launcher'):
 
     super(MPIOp, self).__init__(
           name='mpirun',
           image=arenaImage,
           command=['python','arena_launcher.py'],
-          arguments=[ "--name", '{0}-{{workflow.name}}'.format(name),
+          arguments=[ "--name", 'mpirun-{{workflow.name}}',
                       "--tensorboard", tensorboard,
                       "mpijob",
                       "--gpus", gpus,
