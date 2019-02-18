@@ -33,7 +33,7 @@ class MPIOp(dsl.ContainerOp):
           name='mpirun',
           image=arenaImage,
           command=['python','arena_launcher.py'],
-          arguments=[ "--name", 'mpirun-{{workflow.name}}',
+          arguments=[ "--name", '%s-{{workflow.name}}' % name,
                       "--tensorboard", tensorboard,
                       "mpijob",
                       "--gpus", gpus,
