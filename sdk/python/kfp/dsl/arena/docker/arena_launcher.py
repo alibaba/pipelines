@@ -141,7 +141,7 @@ def main(argv=None):
   setup_custom_logging()
   import sys
   all_args = sys.argv[1:]
-  logging.info("args: {0}".format(all_args))
+  logging.info("args: {0}".format(' '.join(sys.argv)))
   parser = argparse.ArgumentParser(description='Arena launcher')
   parser.add_argument('--name', type=str,
                       help='The job name to specify.',default=None)

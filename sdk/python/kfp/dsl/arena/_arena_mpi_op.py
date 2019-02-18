@@ -35,15 +35,15 @@ class MPIOp(dsl.ContainerOp):
           command=['python','arena_launcher.py'],
           arguments=[ "--name", '%s-{{workflow.name}}' % name,
                       "--tensorboard", tensorboard,
+                      "--rdma", rdma,
+                      "--data", data,
+                      "--output-data", outputData,
                       "mpijob",
                       "--gpus", gpus,
                       "--workers", workers,
                       "--image", image,
                       "--cpu", cpu,
                       "--memory", memory,
-                      "--rdma", rdma,
-                      "--data", data,
-                      "--output-data", outputData,
                       "--", command],
           file_outputs={'train': '/output.txt'})
 
