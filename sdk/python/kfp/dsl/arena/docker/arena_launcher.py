@@ -78,6 +78,59 @@ def _get_tensorboard_url(name, job_type):
 
   return url
 
+# 
+
+# Generate standalone job
+def generate_job_command(args):
+    name = args.name
+    gpus = args.gpus
+    cpu = args.cpu
+    memory = args.memory
+    tensorboard = args.tensorboard
+    image = args.image
+    output_data = args.output_data
+    data = args.data
+    tensorboard_image = args.tensorboard_image
+    tensorboard = str2bool(args.tensorboard)
+    log_dir = args.log_dir
+
+    commandArray = [
+    'arena', 'submit', 'tfjob',
+    '--name={0}'.format(name),
+    '--image={0}'.format(image),
+    ]
+
+    if gpus > 0:
+        commandArray.append("--gpus={0}".format(gpus))
+
+    if cpu > 0:
+        commandArray.append("--cpu={0}".format(cpu))
+
+    if memory >0:
+        commandArray.append("--memory={0}".format(memory))
+
+    if tensorboard_image != "tensorflow/tensorflow:1.12.0":
+        commandArray.append("--tensorboardImage={0}".format(tensorboard_image))    
+
+    if tensorboard:
+        commandArray.append("--tensorboard")
+
+    if os.path.isdir(args.log_dir):  
+        commandArray.append("--logdir={0}".format(args.log_dir))
+    else:
+        logging.info("skip log dir :{0}".format(args.log_dir))
+
+    if len(data) > 0 and data != 'None':
+      dataList = data.split(",")
+      if len(output_data) > 0 and data != 'None':
+        dataList = dataList + list(set([output_data]) - set(dataList))
+
+        for i in range(len(dataList)):
+            commandArray.append("--data={0}".format(dataList[i]))
+
+    return commandArray, "tfjob"
+
+# Generate mpi job
 def generate_mpjob_command(args):
     name = args.name
     workers = args.workers
@@ -156,16 +209,21 @@ def main(argv=None):
   parser.add_argument('--output-data', type=str, default='None')
   parser.add_argument('--log-dir', type=str, default='')
   parser.add_argument('--data', type=str, default='None')
+  parser_mpi.add_argument('--image', type=str)
+  parser_mpi.add_argument('--gpus', type=int, default=0)
+  parser_mpi.add_argument('--cpu', type=int, default=0)
+  parser_mpi.add_argument('--memory', type=int, default=0)
+  parser_mpi.add_argument('--workers', type=int, default=2)
   subparsers = parser.add_subparsers(help='arena sub-command help')
 
   #create the parser for the 'mpijob' command
   parser_mpi = subparsers.add_parser('mpijob', help='mpijob help')
-  parser_mpi.add_argument('--image', type=str)
-  parser_mpi.add_argument('--workers', type=int, default=2)
-  parser_mpi.add_argument('--gpus', type=int, default=0)
-  parser_mpi.add_argument('--cpu', type=int, default=0)
-  parser_mpi.add_argument('--memory', type=int, default=0)
   parser_mpi.set_defaults(func=generate_mpjob_command)
+
+  #create the parser for the 'job' command
+  parser_job = subparsers.add_parser('job', help='job help')
+  parser_job.set_defaults(func=generate_job_command)
+
 
   separator_idx = all_args.index('--')
   launcher_args = all_args[:separator_idx]

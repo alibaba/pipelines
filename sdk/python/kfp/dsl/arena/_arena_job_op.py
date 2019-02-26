@@ -20,7 +20,7 @@ import logging
 
 # def arena_submit_standalone_job_op(name, image, gpus: int, ):
 
-class MPIOp(dsl.ContainerOp):
+class JobOp(dsl.ContainerOp):
   """Submit MPI Job."""
 
   # arena Image is "cheyang/arena_launcher"
@@ -29,21 +29,19 @@ class MPIOp(dsl.ContainerOp):
           data='None', outputData='None',
           arenaImage='cheyang/arena_launcher'):
 
-    super(MPIOp, self).__init__(
-          name='mpijob',
+    super(JobOp, self).__init__(
+          name='standalonejob',
           image=arenaImage,
           command=['python','arena_launcher.py'],
           arguments=[ "--name", '%s-{{workflow.name}}' % name,
                       "--tensorboard", tensorboard,
-                      "--rdma", rdma,
                       "--data", data,
                       "--output-data", outputData,
                       "--image", image,
                       "--gpus", gpus,
                       "--cpu", cpu,
                       "--memory", memory,
-                      "mpijob",
-                      "--workers", workers,
+                      "job",
                       "--", command],
           file_outputs={'train': '/output.txt'})
 
