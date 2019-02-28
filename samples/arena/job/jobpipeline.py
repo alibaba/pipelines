@@ -47,7 +47,7 @@ def jobpipeline():
     name="export",
     image="tensorflow/tensorflow:1.11.0-py3",
     data=data,
-    command="cat %s;python export.py --model_version=1 --checkpoint_path=/training/output/mnist /Tmp/" % train.output)
+    command="cat %s;python export.py --model_version=1 --checkpoint_path=/training/output/mnist /training/output/models" % train.output)
 
 if __name__ == '__main__':
   # EXPERIMENT_NAME="tf_cnn_benchmarks"
@@ -56,4 +56,4 @@ if __name__ == '__main__':
   client = kfp.Client()
   # exp = client.create_experiment(name=EXPERIMENT_NAME)
   id = '55f3d3b2-f230-41f4-936e-a2ec8c6842d6'
-  run = client.run_pipeline(id, 'jobpipeline', 'jobpipeline.py.tar.gz')
+  run = client.run_pipeline(id, 'jobpipeline-1', 'jobpipeline.py.tar.gz')

@@ -183,6 +183,7 @@ def generate_mpjob_command(args):
         dataList = dataList + list(set([output_data]) - set(dataList))
 
         for i in range(len(dataList)):
+          if len(output_data) > 0 and data != 'None':
             commandArray.append("--data={0}".format(dataList[i]))
 
     return commandArray, "mpijob"
@@ -295,8 +296,10 @@ def main(argv=None):
     logging.info("Training Job {0} success.".format(fullname))
   elif status == "FAILED":
     logging.error("Training Job {0} fail.".format(fullname))
+    sys.exit(-1)
   else:
     logging.error("Training Job {0}'s status {1}".format(fullname, status))
+    sys.exit(-1)
 
   with open('/output.txt', 'w') as f:
     f.write(output)
