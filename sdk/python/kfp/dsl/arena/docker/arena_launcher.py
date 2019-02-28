@@ -126,6 +126,7 @@ def generate_job_command(args):
         dataList = dataList + list(set([output_data]) - set(dataList))
 
         for i in range(len(dataList)):
+          if dataList[i] != "None":
             commandArray.append("--data={0}".format(dataList[i]))
 
     return commandArray, "tfjob"
@@ -209,11 +210,11 @@ def main(argv=None):
   parser.add_argument('--output-data', type=str, default='None')
   parser.add_argument('--log-dir', type=str, default='')
   parser.add_argument('--data', type=str, default='None')
-  parser_mpi.add_argument('--image', type=str)
-  parser_mpi.add_argument('--gpus', type=int, default=0)
-  parser_mpi.add_argument('--cpu', type=int, default=0)
-  parser_mpi.add_argument('--memory', type=int, default=0)
-  parser_mpi.add_argument('--workers', type=int, default=2)
+  parser.add_argument('--image', type=str)
+  parser.add_argument('--gpus', type=int, default=0)
+  parser.add_argument('--cpu', type=int, default=0)
+  parser.add_argument('--memory', type=int, default=0)
+  parser.add_argument('--workers', type=int, default=2)
   subparsers = parser.add_subparsers(help='arena sub-command help')
 
   #create the parser for the 'mpijob' command

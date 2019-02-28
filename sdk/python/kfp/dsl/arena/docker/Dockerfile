@@ -2,7 +2,7 @@ FROM golang:1.10-stretch as build
 
 RUN mkdir -p /go/src/github.com/kubeflow && \
     cd /go/src/github.com/kubeflow && \
-    git clone -b features/release-v0.2.0/overall-status https://github.com/cheyang/arena.git
+    git clone https://github.com/kubeflow/arena.git
 
 WORKDIR /go/src/github.com/kubeflow/arena
 

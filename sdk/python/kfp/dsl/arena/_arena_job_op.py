@@ -24,8 +24,8 @@ class JobOp(dsl.ContainerOp):
   """Submit MPI Job."""
 
   # arena Image is "cheyang/arena_launcher"
-  def __init__(self, name, image, workers, gpus, cpu, memory, rdma,
-          tensorboard, tensorboardImage, command,
+  def __init__(self, name, image, command, gpus='0', cpu='0', memory='0',
+          tensorboard='False', tensorboardImage='', 
           data='None', outputData='None',
           arenaImage='cheyang/arena_launcher'):
 
