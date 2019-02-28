@@ -24,7 +24,7 @@ import kfp.dsl as dsl
 )
 def jobpipeline():
 
-  data="training-data:/training"
+  data="user-susan:/training"
   gpus="1"
 
   prepare_data = arena.JobOp(
@@ -47,7 +47,7 @@ def jobpipeline():
     name="export",
     image="tensorflow/tensorflow:1.11.0-py3",
     data=data,
-    command="cat %s;" % train.output)
+    command="cat %s;python export.py --model_version=1 --checkpoint_path=/training/output/mnist /Tmp/" % train.output)
 
 if __name__ == '__main__':
   # EXPERIMENT_NAME="tf_cnn_benchmarks"
