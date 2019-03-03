@@ -323,7 +323,8 @@ def main(argv=None):
   # _wait_job_done(fullname, job_type, datetime.timedelta(minutes=timeout_minutes))
   _wait_job_running(fullname, job_type, datetime.timedelta(minutes=timeout_minutes))
 
-  _job_logging(fullname, job_type)
+  rc = _job_logging(fullname, job_type)
+  logging.info("rc: {0}", rc)
   
   status = _get_job_status(fullname, job_type)
 
