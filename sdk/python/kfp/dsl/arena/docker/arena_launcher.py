@@ -23,6 +23,8 @@ import subprocess
 import six
 import time
 import yaml
+from subprocess import Popen,PIPE
+from shlex import split
 
 def setup_custom_logging():
   logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', 
@@ -43,6 +45,10 @@ def _is_active_status(status):
     logging.info("status: {0}".format(status))
     return status == 'PENDING' or status == 'RUNNING'
 
+def _is_pending_status(status):
+    logging.info("status: {0}".format(status))
+    return status == 'PENDING'
+
 def _wait_job_done(name, job_type, timeout):
   end_time = datetime.datetime.now() + timeout
   status = _get_job_status(name, job_type)
@@ -54,6 +60,32 @@ def _wait_job_done(name, job_type, timeout):
     time.sleep(3)
     status = _get_job_status(name, job_type)
   logging.info("job {0} with type {1} status is {2}".format(name, job_type, status))
+
+def _wait_job_running(name, job_type, timeout):
+  end_time = datetime.datetime.now() + timeout
+  status = _get_job_status(name, job_type)
+  while _is_pending_status(status):
+    if datetime.datetime.now() > end_time:
+      timeoutMsg = "Timeout waiting for job {0} with job type {1} completing.".format(name ,job_type)
+      logging.error(timeoutMsg)
+      raise Exception(timeoutMsg)
+    time.sleep(3)
+    status = _get_job_status(name, job_type)
+  logging.info("job {0} with type {1} status is {2}".format(name, job_type, status))
+
+def _job_logging(name, job_type):
+  logging_cmd = "arena logs -f %s" % (name)
+  process = Popen(split(logging_cmd), stdout = PIPE, stderr = PIPE, encoding='utf8')
+  while True:
+    output = process.stdout.readline()
+  if output == "" and process.poll() is not None:
+    break
+  if output:
+    print("", output.strip())
+  rc = process.poll()
+  return rc
+
+
 
 def _get_job_status(name, job_type):
   get_cmd = "arena get %s --type %s | grep -i STATUS:|awk -F: '{print $NF}'" % (name, job_type)
@@ -256,7 +288,7 @@ def main(argv=None):
   
   command=command.replace("--name={0}".format(name),"--name={0}".format(fullname))
   
-  logging.info('Start training %s.'.format(command))
+  logging.info('Start training {0}.'.format(command))
   
   _submit_job(command)
   
@@ -288,7 +320,10 @@ def main(argv=None):
   succ = True
 
   # wait for job done
-  _wait_job_done(fullname, job_type, datetime.timedelta(minutes=timeout_minutes))
+  # _wait_job_done(fullname, job_type, datetime.timedelta(minutes=timeout_minutes))
+  _wait_job_running(fullname, job_type, datetime.timedelta(minutes=timeout_minutes))
+
+  _job_logging(fullname, job_type)
   
   status = _get_job_status(fullname, job_type)
 
