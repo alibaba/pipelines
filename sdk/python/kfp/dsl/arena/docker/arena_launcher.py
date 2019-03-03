@@ -78,10 +78,10 @@ def _job_logging(name, job_type):
   process = Popen(split(logging_cmd), stdout = PIPE, stderr = PIPE, encoding='utf8')
   while True:
     output = process.stdout.readline()
-  if output == "" and process.poll() is not None:
-    break
-  if output:
-    print("", output.strip())
+    if output == "" and process.poll() is not None:
+      break
+    if output:
+      print("", output.strip())
   rc = process.poll()
   return rc
 
@@ -176,7 +176,7 @@ def generate_mpjob_command(args):
     data = args.data
     tensorboard_image = args.tensorboard_image
     tensorboard = str2bool(args.tensorboard)
-    rdma = str2bool(args.tensorboard)
+    rdma = str2bool(args.rdma)
     log_dir = args.log_dir
 
     commandArray = [
@@ -324,7 +324,7 @@ def main(argv=None):
   _wait_job_running(fullname, job_type, datetime.timedelta(minutes=timeout_minutes))
 
   rc = _job_logging(fullname, job_type)
-  logging.info("rc: {0}", rc)
+  logging.info("rc: {0}".format(rc))
   
   status = _get_job_status(fullname, job_type)
 
