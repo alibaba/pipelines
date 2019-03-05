@@ -23,10 +23,11 @@ import kfp.dsl as dsl
   description='shows how to run pipeline jobs.'
 )
 def jobpipeline():
-
+  """A pipeline for end to end machine learning workflow."""
   data="user-susan:/training"
   gpus="1"
 
+  # 1. prepare data
   prepare_data = arena.JobOp(
     name="prepare-data",
 		image="byrnedo/alpine-curl",
@@ -37,13 +38,24 @@ def jobpipeline():
   curl -O https://code.aliyun.com/xiaozhou/tensorflow-sample-code/raw/master/data/t10k-labels-idx1-ubyte.gz && \
   curl -O https://code.aliyun.com/xiaozhou/tensorflow-sample-code/raw/master/data/train-images-idx3-ubyte.gz && \
   curl -O https://code.aliyun.com/xiaozhou/tensorflow-sample-code/raw/master/data/train-labels-idx1-ubyte.gz")
+  # 2. prepare source code
+  prepare_code = arena.JobOp(
+    name="source-code",
+    image="alpine/git",
+    data=data,
+    command="mkdir -p /training/models/ && \
+  cd /training/models/ && \
+  if [ ! -d /training/models/tensorflow-sample-code ]; then git clone https://code.aliyun.com/xiaozhou/tensorflow-sample-code.git; else echo no need download;fi")
+
+  # 3. train the models
   train = arena.JobOp(
     name="train",
     image="tensorflow/tensorflow:1.11.0-gpu-py3",
     gpus=gpus,
     data=data,
     command="echo %s;python /training/models/tensorflow-sample-code/tfjob/docker/mnist/main.py --max_steps 500 --data_dir /training/dataset/mnist --log_dir /training/output/mnist" % prepare_data.output)
-  export = arena.JobOp(
+  # 4. export the model
+  export_model = arena.JobOp(
     name="export-model",
     image="tensorflow/tensorflow:1.11.0-py3",
     data=data,
