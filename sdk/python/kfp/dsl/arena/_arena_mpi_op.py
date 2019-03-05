@@ -30,7 +30,7 @@ class MPIOp(dsl.ContainerOp):
           arenaImage='cheyang/arena_launcher'):
 
     super(MPIOp, self).__init__(
-          name='mpijob',
+          name=name,
           image=arenaImage,
           command=['python','arena_launcher.py'],
           arguments=[ "--name", '%s-{{workflow.name}}' % name,

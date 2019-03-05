@@ -21,7 +21,7 @@ import logging
 # def arena_submit_standalone_job_op(name, image, gpus: int, ):
 
 class JobOp(dsl.ContainerOp):
-  """Submit MPI Job."""
+  """Submit standalone Job."""
 
   # arena Image is "cheyang/arena_launcher"
   def __init__(self, name, image, command, gpus='0', cpu='0', memory='0',
@@ -30,7 +30,7 @@ class JobOp(dsl.ContainerOp):
           arenaImage='cheyang/arena_launcher'):
 
     super(JobOp, self).__init__(
-          name='standalonejob',
+          name=name,
           image=arenaImage,
           command=['python','arena_launcher.py'],
           arguments=[ "--name", '%s-{{workflow.name}}' % name,
