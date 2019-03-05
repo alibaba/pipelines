@@ -327,6 +327,8 @@ def main(argv=None):
   rc = _job_logging(fullname, job_type)
   logging.info("rc: {0}".format(rc))
   
+  _wait_job_done(fullname, job_type, datetime.timedelta(minutes=timeout_minutes))
+  
   status = _get_job_status(fullname, job_type)
 
   if status == "SUCCEEDED":
