@@ -53,7 +53,7 @@ def jobpipeline():
     image="tensorflow/tensorflow:1.11.0-gpu-py3",
     gpus=gpus,
     data=data,
-    command="echo %s;echo %s;python /training/models/tensorflow-sample-code/tfjob/docker/mnist/main.py --max_steps 500 --data_dir /training/dataset/mnist --log_dir /training/output/mnist" % (prepare_data.output, prepare_code))
+    command="echo %s;echo %s;python /training/models/tensorflow-sample-code/tfjob/docker/mnist/main.py --max_steps 500 --data_dir /training/dataset/mnist --log_dir /training/output/mnist" % (prepare_data.output, prepare_code.output))
   # 4. export the model
   export_model = arena.JobOp(
     name="export-model",
