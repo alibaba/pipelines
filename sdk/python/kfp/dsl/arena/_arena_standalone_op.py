@@ -20,7 +20,7 @@ import logging
 
 # def arena_submit_standalone_job_op(name, image, gpus: int, ):
 
-class JobOp(dsl.ContainerOp):
+class StandaloneOp(dsl.ContainerOp):
   """Submit standalone Job."""
 
   # arena Image is "cheyang/arena_launcher"
@@ -29,7 +29,7 @@ class JobOp(dsl.ContainerOp):
           data='None', outputData='None',
           arenaImage='cheyang/arena_launcher'):
 
-    super(JobOp, self).__init__(
+    super(StandaloneOp, self).__init__(
           name=name,
           image=arenaImage,
           command=['python','arena_launcher.py'],
