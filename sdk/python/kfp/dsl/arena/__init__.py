@@ -13,4 +13,4 @@
 # limitations under the License.
 
 from ._arena_mpi_op import MPIOp
-from ._arena_standalone_op import JobOp
+from ._arena_standalone_op import StandaloneOp
