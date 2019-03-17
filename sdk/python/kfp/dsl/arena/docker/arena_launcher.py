@@ -86,6 +86,21 @@ def _job_logging(name, job_type):
   rc = process.poll()
   return rc
 
+def _collect_metrics(name, job_type, metric_name):
+  metrics_cmd = "arena logs --tail=50 %s | grep %s= | tail -1" % (name, key)
+  metric = ""
+  try:
+    import re
+    output = subprocess.check_output(get_cmd, stderr=subprocess.STDOUT, shell=True)
+    result = output.decode().strip()
+    result = result.split("%s=" % (metric_name))
+    result = re.findall(r'\d+\.*\d*',result[-1])
+    metric = float(result[-1])
+  except subprocess.CalledProcessError as e:
+    logging.warning("Failed to get job status due to" + e)
+
+  return metric
+
 
 
 def _get_job_status(name, job_type):
@@ -249,6 +264,8 @@ def main(argv=None):
   parser.add_argument('--cpu', type=int, default=0)
   parser.add_argument('--memory', type=int, default=0)
   parser.add_argument('--workers', type=int, default=2)
+  parser.add_argument('--metric-name', type=str, default='Train-accuracy')
+  parser.add_argument('--metric-unit', type=str, default='PERCENTAGE')
   subparsers = parser.add_subparsers(help='arena sub-command help')
 
   #create the parser for the 'mpijob' command
@@ -280,6 +297,8 @@ def main(argv=None):
   name = args.name
   fullname = name + datetime.datetime.now().strftime("%Y%M%d%H%M%S")
   timeout_minutes = args_dict.pop('timeout_minutes')
+  metric_name = args_dict.pop('metric_name')
+  metric_unit = args_dict.pop('metric_unit')
 
 
   enableTensorboard = str2bool(args.tensorboard)
@@ -333,6 +352,16 @@ def main(argv=None):
 
   if status == "SUCCEEDED":
     logging.info("Training Job {0} success.".format(fullname))
+    value = _collect_metrics(metric_name)
+    metrics = {
+    'metrics': [{
+      'name': 'accuracy-score', # The name of the metric. Visualized as the column name in the runs table.
+      'numberValue':  value, # The value of the metric. Must be a numeric value.
+      'format': metric_unit,   # The optional format of the metric. Supported values are "RAW" (displayed in raw format) and "PERCENTAGE" (displayed in percentage format).
+    }]
+  }
+    with file_io.FileIO('/mlpipeline-metrics.json', 'w') as f:
+      json.dump(metrics, f)
   elif status == "FAILED":
     logging.error("Training Job {0} fail.".format(fullname))
     sys.exit(-1)
