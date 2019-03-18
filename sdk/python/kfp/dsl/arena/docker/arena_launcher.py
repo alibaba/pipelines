@@ -93,10 +93,13 @@ def _collect_metrics(name, job_type, metric_name):
     import re
     output = subprocess.check_output(metrics_cmd, stderr=subprocess.STDOUT, shell=True)
     result = output.decode().strip()
-    result = result.split("%s=" % (metric_name))
-    if len(result) > 0:
-      result = re.findall(r'\d+\.*\d*',result[-1])
-      metric = float(result[-1])
+    if metric_name+"=" not in result:
+        return 0
+    array = result.split("%s=" % (metric_name))
+    if len(array) > 0:
+      logging.info(array)
+      result = re.findall(r'\d+\.*\d*',array[-1])
+      metric = float(array[-1])
   except Exception as e:
     logging.warning("Failed to get job status due to" + e)
     return 0
@@ -358,7 +361,7 @@ def main(argv=None):
     if value > 0:
       metrics = {
         'metrics': [{
-          'name': 'accuracy-score', # The name of the metric. Visualized as the column name in the runs table.
+          'name': metric_name, # The name of the metric. Visualized as the column name in the runs table.
           'numberValue':  value, # The value of the metric. Must be a numeric value.
           'format': metric_unit,   # The optional format of the metric. Supported values are "RAW" (displayed in raw format) and "PERCENTAGE" (displayed in percentage format).
         }]
