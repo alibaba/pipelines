@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: arena-launcher-job
+  name: arena-launcher-metric
   namespace: kube-system
 spec:
   serviceAccountName: admin
@@ -13,19 +13,12 @@ spec:
     - arena_launcher.py
     args:
     - --name
-    - download-data
-    - --data
-    - "training:/training"
+    - pytorch
     - --image
-    - byrnedo/alpine-curl
+    - katib/mxnet-mnist-example
     - job
     - --
-    - "mkdir -p /training/dataset/mnist && \
-  cd /training/dataset/mnist && \
-  curl -O https://code.aliyun.com/xiaozhou/tensorflow-sample-code/raw/master/data/t10k-images-idx3-ubyte.gz && \
-  curl -O https://code.aliyun.com/xiaozhou/tensorflow-sample-code/raw/master/data/t10k-labels-idx1-ubyte.gz && \
-  curl -O https://code.aliyun.com/xiaozhou/tensorflow-sample-code/raw/master/data/train-images-idx3-ubyte.gz && \
-  curl -O https://code.aliyun.com/xiaozhou/tensorflow-sample-code/raw/master/data/train-labels-idx1-ubyte.gz"
-    image: cheyang/arena_launcher
+    - "python /mxnet/example/image-classification/train_mnist.py --batch-size=64"
+    image: cheyang/arena_launcher:v3
     imagePullPolicy: Always
     name: arena-launcher

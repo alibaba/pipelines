@@ -87,17 +87,19 @@ def _job_logging(name, job_type):
   return rc
 
 def _collect_metrics(name, job_type, metric_name):
-  metrics_cmd = "arena logs --tail=50 %s | grep %s= | tail -1" % (name, key)
-  metric = ""
+  metrics_cmd = "arena logs --tail=50 %s | grep %s= | tail -1" % (name, metric_name)
+  metric = 0
   try:
     import re
-    output = subprocess.check_output(get_cmd, stderr=subprocess.STDOUT, shell=True)
+    output = subprocess.check_output(metrics_cmd, stderr=subprocess.STDOUT, shell=True)
     result = output.decode().strip()
     result = result.split("%s=" % (metric_name))
-    result = re.findall(r'\d+\.*\d*',result[-1])
-    metric = float(result[-1])
-  except subprocess.CalledProcessError as e:
+    if len(result) > 0:
+      result = re.findall(r'\d+\.*\d*',result[-1])
+      metric = float(result[-1])
+  except Exception as e:
     logging.warning("Failed to get job status due to" + e)
+    return 0
 
   return metric
 
@@ -352,16 +354,18 @@ def main(argv=None):
 
   if status == "SUCCEEDED":
     logging.info("Training Job {0} success.".format(fullname))
-    value = _collect_metrics(metric_name)
-    metrics = {
-    'metrics': [{
-      'name': 'accuracy-score', # The name of the metric. Visualized as the column name in the runs table.
-      'numberValue':  value, # The value of the metric. Must be a numeric value.
-      'format': metric_unit,   # The optional format of the metric. Supported values are "RAW" (displayed in raw format) and "PERCENTAGE" (displayed in percentage format).
-    }]
-  }
-    with file_io.FileIO('/mlpipeline-metrics.json', 'w') as f:
-      json.dump(metrics, f)
+    value = _collect_metrics(fullname, job_type, metric_name)
+    if value > 0:
+      metrics = {
+        'metrics': [{
+          'name': 'accuracy-score', # The name of the metric. Visualized as the column name in the runs table.
+          'numberValue':  value, # The value of the metric. Must be a numeric value.
+          'format': metric_unit,   # The optional format of the metric. Supported values are "RAW" (displayed in raw format) and "PERCENTAGE" (displayed in percentage format).
+        }]
+      }
+      with open('/mlpipeline-metrics.json', 'w') as f:
+        json.dump(metrics, f)
+    logging.info("write down metrics.json")
   elif status == "FAILED":
     logging.error("Training Job {0} fail.".format(fullname))
     sys.exit(-1)
