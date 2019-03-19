@@ -6,7 +6,9 @@ RUN mkdir -p /go/src/github.com/kubeflow && \
 
 WORKDIR /go/src/github.com/kubeflow/arena
 
-RUN cd /go/src/github.com/kubeflow/arena && make
+RUN cd /go/src/github.com/cheyang/arena && \
+    git checkout deprecated_options && \
+    make
 
 RUN wget https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz && \
     tar -xvf helm-v2.9.1-linux-amd64.tar.gz && \

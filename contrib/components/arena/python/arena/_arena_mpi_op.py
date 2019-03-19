@@ -17,7 +17,7 @@
 import kfp.dsl as dsl
 import datetime
 import logging
-from . import get_defaultData
+
 
 # def arena_submit_standalone_job_op(name, image, gpus: int, ):
 
@@ -28,9 +28,9 @@ class MPIOp(dsl.ContainerOp):
   def __init__(self, name, image, workers, gpus, cpu, memory, rdma,
           tensorboard, tensorboardImage, command,
           data='None', outputData='None',
-          arenaImage='cheyang/arena_launcher'):
-    if data == 'None':
-      data = get_defaultData()
+          arenaImage='cheyang/arena_launcher',
+          metricName='Train-accuracy',
+          metricUnit='PERCENTAGE'):
 
     super(MPIOp, self).__init__(
           name=name,
@@ -45,6 +45,8 @@ class MPIOp(dsl.ContainerOp):
                       "--gpus", gpus,
                       "--cpu", cpu,
                       "--memory", memory,
+                      "--metric-name'", metricName,
+                      "--metric-unit'", metricUnit,
                       "mpijob",
                       "--workers", workers,
                       "--", command],
