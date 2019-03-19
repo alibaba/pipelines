@@ -26,20 +26,22 @@ class StandaloneOp(dsl.ContainerOp):
 
   # arena Image is "cheyang/arena_launcher"
   def __init__(self, name, image, command, gpus='0', cpu='0', memory='0',
-          tensorboard='False', tensorboardImage='', 
-          data='None', outputData='None',
-          arenaImage='cheyang/arena_launcher'):
+          tensorboard='False', tensorboard_image='', 
+          data='None', output_data='None',
+          arena_image='cheyang/arena_launcher',
+          metric_name='Train-accuracy',
+          metric_unit='PERCENTAGE'):
     if data == 'None':
       data = get_defaultData()
 
     super(StandaloneOp, self).__init__(
           name=name,
-          image=arenaImage,
+          image=arena_image,
           command=['python','arena_launcher.py'],
           arguments=[ "--name", '%s-{{workflow.name}}' % name,
                       "--tensorboard", tensorboard,
                       "--data", data,
-                      "--output-data", outputData,
+                      "--output-data", output_data,
                       "--image", image,
                       "--gpus", gpus,
                       "--cpu", cpu,

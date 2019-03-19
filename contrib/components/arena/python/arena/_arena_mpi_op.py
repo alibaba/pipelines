@@ -26,11 +26,11 @@ class MPIOp(dsl.ContainerOp):
 
   # arena Image is "cheyang/arena_launcher"
   def __init__(self, name, image, workers, gpus, cpu, memory, rdma,
-          tensorboard, tensorboardImage, command,
-          data='None', outputData='None',
+          tensorboard, tensorboard_image, command,
+          data='None', output_data='None',
           arenaImage='cheyang/arena_launcher',
-          metricName='Train-accuracy',
-          metricUnit='PERCENTAGE'):
+          metric_name='Train-accuracy',
+          metric_unit='PERCENTAGE'):
 
     super(MPIOp, self).__init__(
           name=name,
@@ -40,13 +40,13 @@ class MPIOp(dsl.ContainerOp):
                       "--tensorboard", tensorboard,
                       "--rdma", rdma,
                       "--data", data,
-                      "--output-data", outputData,
+                      "--output-data", output_data,
                       "--image", image,
                       "--gpus", gpus,
                       "--cpu", cpu,
                       "--memory", memory,
-                      "--metric-name'", metricName,
-                      "--metric-unit'", metricUnit,
+                      "--metric-name'", metric_name,
+                      "--metric-unit'", metric_unit,
                       "mpijob",
                       "--workers", workers,
                       "--", command],

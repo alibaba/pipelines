@@ -24,21 +24,21 @@ class DistributeTFOp(dsl.ContainerOp):
   """Submit MPI Job."""
 
   # arena Image is "cheyang/arena_launcher"
-  def __init__(self, name, image, workers, ps, gpus, workerCpu, workerMemory, psCpu, psMemory,
+  def __init__(self, name, image, workers, ps, gpus, worker_cpu, worker_memory, ps_cpu, ps_memory,
           rdma,
-          tensorboard, tensorboardImage, command, chief=0, evaluator=0,
-          data='None', outputData='None',
-          arenaImage='cheyang/arena_launcher'):
+          tensorboard, tensorboard_image, command, chief=0, evaluator=0,
+          data='None', output_data='None',
+          arena_image='cheyang/arena_launcher'):
 
     super(MPIOp, self).__init__(
           name=name,
-          image=arenaImage,
+          image=arena_image,
           command=['python','arena_launcher.py'],
           arguments=[ "--name", '%s-{{workflow.name}}' % name,
                       "--tensorboard", tensorboard,
                       "--rdma", rdma,
                       "--data", data,
-                      "--output-data", outputData,
+                      "--output-data", output_data,
                       "--image", image,
                       "--gpus", gpus,
                       "--cpu", cpu,
