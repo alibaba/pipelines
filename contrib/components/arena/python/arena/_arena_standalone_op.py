@@ -17,7 +17,7 @@
 import kfp.dsl as dsl
 import datetime
 import logging
-from . import get_defaultData
+
 
 # def arena_submit_standalone_job_op(name, image, gpus: int, ):
 
@@ -31,9 +31,6 @@ class StandaloneOp(dsl.ContainerOp):
           arena_image='cheyang/arena_launcher',
           metric_name='Train-accuracy',
           metric_unit='PERCENTAGE'):
-    if data == 'None':
-      data = get_defaultData()
-
     super(StandaloneOp, self).__init__(
           name=name,
           image=arena_image,
@@ -46,6 +43,8 @@ class StandaloneOp(dsl.ContainerOp):
                       "--gpus", gpus,
                       "--cpu", cpu,
                       "--memory", memory,
+                      "--metric-name", metric_name,
+                      "--metric-unit", metric_unit,
                       "job",
                       "--", command],
           file_outputs={'train': '/output.txt'})

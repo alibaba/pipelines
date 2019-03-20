@@ -14,4 +14,3 @@
 
 from ._arena_mpi_op import MPIOp
 from ._arena_standalone_op import StandaloneOp
-from ._utils import set_defaultData
