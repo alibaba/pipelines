@@ -26,6 +26,7 @@ def jobpipeline():
   """A pipeline for end to end machine learning workflow."""
   data="user-susan:/training"
   gpus="1"
+  model_version="1"
 
   # 1. prepare data
   prepare_data = arena.StandaloneOp(
@@ -59,12 +60,17 @@ def jobpipeline():
     name="export-model",
     image="tensorflow/tensorflow:1.11.0-py3",
     data=data,
-    command="echo %s;python /training/models/tensorflow-sample-code/tfjob/docker/mnist/export_model.py --model_version=1 --checkpoint_path=/training/output/mnist /training/output/models" % train.output)
+    command="echo %s;python /training/models/tensorflow-sample-code/tfjob/docker/mnist/export_model.py --model_version=%s --checkpoint_path=/training/output/mnist /training/output/models" % (train.output, model_version))
 
 if __name__ == '__main__':
   EXPERIMENT_NAME="standalonejob"
+  RUN_ID="run"
+  KFP_SERVICE="ml-pipeline.kubeflow.svc.cluster.local:8888"
   import kfp.compiler as compiler
   compiler.Compiler().compile(jobpipeline, __file__ + '.tar.gz')
-  client = kfp.Client()
-  exp = client.create_experiment(name=EXPERIMENT_NAME)
-  run = client.run_pipeline(exp.id, 'jobpipeline-1', 'jobpipeline.py.tar.gz')
+  client = kfp.Client(host=KFP_SERVICE)
+  try:
+    experiment_id = client.get_experiment(experiment_name=EXPERIMENT_NAME).id
+  except:
+    experiment_id = client.create_experiment(EXPERIMENT_NAME).id
+  run = client.run_pipeline(experiment_id, RUN_ID, 'standalonejob_pipeline.py.tar.gz')

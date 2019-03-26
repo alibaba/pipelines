@@ -12,11 +12,6 @@ This sample requires to create distributed storage. In this sample, we use NFS a
 # mkdir -p /nfs
 # mount -t nfs -o vers=4.0 NFS_SERVER_IP:/ /nfs
 # mkdir -p /data
-# cd /data
-# wget https://raw.githubusercontent.com/cheyang/tensorflow-sample-code/master/data/t10k-images-idx3-ubyte.gz
-# wget https://raw.githubusercontent.com/cheyang/tensorflow-sample-code/master/data/t10k-labels-idx1-ubyte.gz
-# wget https://raw.githubusercontent.com/cheyang/tensorflow-sample-code/master/data/train-images-idx3-ubyte.gz
-# wget https://raw.githubusercontent.com/cheyang/tensorflow-sample-code/master/data/train-labels-idx1-ubyte.gz
 # cd /
 # umount /nfs
 ```
@@ -78,3 +73,10 @@ First, install the necessary Python Packages
 pip3 install http://kubeflow.oss-cn-beijing.aliyuncs.com/kfp/v0.5.0/kfp.tar.gz --upgrade
 pip3 install http://kubeflow.oss-cn-beijing.aliyuncs.com/kip-arena/kfp-arena-0.1.tar.gz --upgrade
 ```
+
+Then run [standalone_pipeline.py](standalone_pipeline.py).
+
+### 2. With Jupyter Notebook
+Run `jupyter notebook` to start running your jupyter server and load the notebook `standalone_pipeline.ipynb`
+
+
