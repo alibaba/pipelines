@@ -23,9 +23,9 @@ This sample requires to create distributed storage. In this sample, we use NFS a
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: tfdata
+  name: user-susan
   labels:
-    tfdata: nas-mnist
+    user-susan: nas-mnist
 spec:
   persistentVolumeReclaimPolicy: Retain
   capacity:
@@ -46,7 +46,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: tfdata
+  name: user-susan
   annotations:
     description: "this is the mnist demo"
     owner: Tom
@@ -58,7 +58,7 @@ spec:
        storage: 5Gi
   selector:
     matchLabels:
-      tfdata: nas-mnist
+      user-susan: nas-mnist
 # kubectl create -f nfs-pvc.yaml
 ```
 
@@ -74,9 +74,23 @@ pip3 install http://kubeflow.oss-cn-beijing.aliyuncs.com/kfp/v0.5.0/kfp.tar.gz -
 pip3 install http://kubeflow.oss-cn-beijing.aliyuncs.com/kip-arena/kfp-arena-0.1.tar.gz --upgrade
 ```
 
-Then run [standalone_pipeline.py](standalone_pipeline.py).
+Then run [standalone_pipeline.py](standalone_pipeline.py) with different parameters.
+
+```
+python3 standalone_pipeline.py --learning_rate 0.0001 --dropout 0.8 --model_version 2
+```
+
+```
+python3 standalone_pipeline.py --learning_rate 0.0005 --dropout 0.8 --model_version 3
+```
 
 ### 2. With Jupyter Notebook
 Run `jupyter notebook` to start running your jupyter server and load the notebook `standalone_pipeline.ipynb`
+
+
+### 3. Compare the result in pipelines dashboard
+
+
+![](demo.jpg)
 
 
