@@ -4,7 +4,9 @@ The `standalone_pipeline.py` sample creates a pipeline runs preparing dataset, M
 
 ## Requirements
 
-This sample requires to create distributed storage. In this sample, we use NFS as example.
+- Install arena
+
+- This sample requires to create distributed storage. In this sample, we use NFS as example.
 
 1. You need to create `/data` in the NFS Server, and prepare `mnist data`
 
