@@ -19,7 +19,7 @@ import datetime
 import logging
 
 
-def esitmator_op(name, image, command, 
+def estimator_op(name, image, command, 
                       chief_cpu, chief_memory, chief_port,
                       workers, worker_image, worker_cpu, worker_memory,
                       parameter_servers, ps_image, ps_cpu, ps_memory, ps_port, 
