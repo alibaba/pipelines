@@ -139,7 +139,32 @@ def _get_tensorboard_url(name, job_type):
 
   return url
 
+def _write_output_file(name, job_type, fielname):
+    # TODO(cheyang): copy the output.txt from training job
+    chief = _get_chief(name, job_type)
+    if len(chief) == 0:
+        logging.info("failed to find the chief for %s" %s (name))
+        return
+    
+    with open(fielname, 'w') as f:
+      f.write(output)
+
 # 
+def _get_chief(name, job_type):
+    get_cmd = "arena get %s --type %s -oyaml| grep -i cheifName:|awk -F: '{print $NF}'" % (name, job_type)
+    chief = ""
+    try:
+      output=subprocess.check_output(get_cmd, stderr=subprocess.STDOUT, shell=True)
+      chief = output.decode()
+      chief = chief.strip()
+    except subprocess.CalledProcessError as e:
+      logging.warning("Failed to get cheif name due to" + e)
+
+    return chief
+
+def _kubectl_cp(name, file):
+    kubectl_cp = "kubectl cp -c main %s:%s %s" % (name, file, file)
+    # Notice it's not supported yet
 
 # Generate standalone job
 def generate_job_command(args):
@@ -279,6 +304,7 @@ def main(argv=None):
   parser.add_argument('--workers', type=int, default=2)
 
   parser.add_argument('--env', action='append', type=str, default=[])
+  parser.add_argument('--file-output', action='append', type=str, default=[])
   parser.add_argument('--data', action='append', type=str, default=[])
   parser.add_argument('--metric', action='append', type=str, default=[])
 
@@ -387,10 +413,14 @@ def main(argv=None):
     logging.error("Training Job {0}'s status {1}".format(fullname, status))
     sys.exit(-1)
 
-  # TODO(cheyang): copy the output.txt from training job
   output=""
   with open('/output.txt', 'w') as f:
     f.write(output)
+
+  file_outputs = args.file_output
+  if file_outputs is not None:
+    for filename in file_outputs:
+      _write_output_file(filename)
 
 
 if __name__== "__main__":

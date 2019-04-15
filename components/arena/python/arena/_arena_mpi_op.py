@@ -21,10 +21,10 @@ import logging
 def mpi_job_op(name, image, command, workers=1, gpus=0, cpu=0, memory=0, env=[],annotations=[],
           data=[], sync_source=None,
           rdma=False,
-          tensorboard=False,  tensorboard_image=None, 
+          tensorboard=False, tensorboard_image=None, 
           metrics=['Train-accuracy:PERCENTAGE'],
           arenaImage='cheyang/arena_launcher:v0.3',
-          timeout_hours=240):
+          timeout_hours=240, file_outputs={}):
     """This function submits MPI Job, it can run Allreduce-style Distributed Training.
 
     Args:
@@ -63,6 +63,14 @@ def mpi_job_op(name, image, command, workers=1, gpus=0, cpu=0, memory=0, env=[],
       options.append('--tensorboard-image')
       options.append(str(tensorboard_image))
 
+    if file_outputs is None:
+      file_outputs = {'train': '/output.txt'}
+
+    if len(file_outputs)>0:
+      for key, value in d.items():
+        options.append('--file-output')
+        options.append(str(value))
+
     return dsl.ContainerOp(
           name=name,
           image=arenaImage,
@@ -80,5 +88,5 @@ def mpi_job_op(name, image, command, workers=1, gpus=0, cpu=0, memory=0, env=[],
                       [
                       "mpijob",
                       "--", str(command)],
-          file_outputs={'train': '/output.txt'}
+          file_outputs=file_outputs
     )

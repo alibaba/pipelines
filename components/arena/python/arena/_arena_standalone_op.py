@@ -24,7 +24,7 @@ def standalone_job_op(name, image, command, gpus=0, cpu=0, memory=0, env=[],
           data=[], sync_source=None, annotations=[],
           metrics=['Train-accuracy:PERCENTAGE'],
           arena_image='cheyang/arena_launcher:v0.3',
-          timeout_hours=240):
+          timeout_hours=240, file_outputs={}):
 
     """This function submits a standalone training Job 
 
@@ -64,6 +64,14 @@ def standalone_job_op(name, image, command, gpus=0, cpu=0, memory=0, env=[],
       options.append('--tensorboard-image')
       options.append(str(tensorboard_image))
 
+    if file_outputs is None:
+      file_outputs = {'train': '/output.txt'}
+
+    if len(file_outputs)>0:
+      for key, value in d.items():
+        options.append('--file-output')
+        options.append(str(value))
+
     return dsl.ContainerOp(
           name=name,
           image=arena_image,
@@ -79,5 +87,5 @@ def standalone_job_op(name, image, command, gpus=0, cpu=0, memory=0, env=[],
                       [
                       "job",
                       "--", str(command)],
-          file_outputs={'train': '/output.txt'}
+          file_outputs=file_outputs
       )
